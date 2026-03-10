@@ -687,7 +687,7 @@ function renderUbicaciones() {
 function verQR(id) {
   const u = DB.ubi.find(x => x.id === id); if (!u) return;
   const base = window.location.origin + window.location.pathname;
-  const url  = `${base}?ci=1&locId=${id}&lat=${u.lat}&lng=${u.lng}&r=${u.radio}&n=${encodeURIComponent(u.nombre)}&sid=${DB.spreadsheetId||''}`;
+  const url  = `${base}?ci=1&locId=${id}&lat=${u.lat}&lng=${u.lng}&r=${u.radio}&n=${encodeURIComponent(u.nombre)}&sid=${DB.spreadsheetId||''}&modo=guardia`;
   document.getElementById('qr-title').textContent = u.nombre;
   document.getElementById('qr-sub').textContent   = `Radio: ${u.radio}m · ${u.lat.toFixed(4)}, ${u.lng.toFixed(4)}`;
   document.getElementById('qr-url').textContent   = url;
@@ -1048,11 +1048,31 @@ function calcDist(lat1, lon1, lat2, lon2) {
 // Detectar parámetros de redirect de OAuth
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('auth') === 'ok' || urlParams.get('auth_error')) {
-  history.replaceState({}, '', window.location.pathname); // limpiar URL
+  history.replaceState({}, '', window.location.pathname); // limpiar URL
 }
 
-checkAuth();
-renderUbicaciones();
+// --- SISTEMA DE BLOQUEO: MODO GUARDIA ---
+if (urlParams.get('modo') === 'guardia') {
+    // 1. Ocultamos la barra superior (nav, botones, etc)
+    const topBar = document.getElementById('bar');
+    if (topBar) topBar.style.display = 'none';
+
+    // 2. Ocultamos TODAS las páginas para asegurarnos
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+    
+    // 3. Mostramos SOLO la vista del empleado
+    const pageCheckin = document.getElementById('page-checkin');
+    if (pageCheckin) pageCheckin.classList.add('on');
+    
+    // 4. (Opcional pero recomendado) Ocultamos el título "Simulador de check-in" para que sea más prolijo
+    const secHead = pageCheckin.querySelector('.sec-head');
+    if (secHead) secHead.style.display = 'none';
+} else {
+    // Si NO es guardia, inicializamos normal
+    checkAuth();
+    renderUbicaciones();
+}
+
 </script>
 </body>
 </html>
