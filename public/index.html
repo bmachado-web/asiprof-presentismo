@@ -1064,11 +1064,19 @@ if (urlParams.get('modo') === 'guardia') {
     const pageCheckin = document.getElementById('page-checkin');
     if (pageCheckin) pageCheckin.classList.add('on');
     
-    // 4. (Opcional pero recomendado) Ocultamos el título "Simulador de check-in" para que sea más prolijo
+    // 4. Ocultamos el título "Simulador" 
     const secHead = pageCheckin.querySelector('.sec-head');
     if (secHead) secHead.style.display = 'none';
+
+    // 5. Ocultamos el cajón de "Elegir ubicación manual" para que el guardia no pueda cambiarlo
+    const selectorManual = pageCheckin.querySelector('.card');
+    if (selectorManual) selectorManual.style.display = 'none';
+
+    // 6. ¡LA CLAVE! Encendemos el lector para que procese el QR automáticamente
+    initCheckin();
+
 } else {
-    // Si NO es guardia, inicializamos normal
+    // Si NO es guardia, inicializamos normal para el administrador
     checkAuth();
     renderUbicaciones();
 }
